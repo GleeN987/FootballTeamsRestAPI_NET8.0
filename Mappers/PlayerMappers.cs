@@ -17,7 +17,8 @@ namespace api.Mappers
                 Age = player.Age,
                 Position = player.Position,
                 Nationality = player.Nationality,
-                TeamName = player.Team.Name
+                TeamId = player.TeamId
+                
             };
         }
 
@@ -29,7 +30,7 @@ namespace api.Mappers
                 Age = dto.Age,
                 Position = dto.Position,
                 Nationality = dto.Nationality,
-                Team = 
+                TeamId = dto.TeamId
             };
         }
     }

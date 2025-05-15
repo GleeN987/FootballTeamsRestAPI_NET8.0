@@ -7,6 +7,7 @@ using api.DTOs;
 using api.Models;
 using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -21,26 +22,31 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public List<Player> GetPlayers()
+        public async Task<IActionResult> GetPlayers()
         {
-            var players = _context.Players.ToList();
-            return players;
+            var players = await _context.Players
+            .Include(p => p.Team)
+            .ToListAsync();
+
+            var playersDto = players.Select(p => p.ToPlayerDTO());
+            
+            return Ok(playersDto);
         }
 
         [HttpPost]
-        public IActionResult AddPlayer([FromBody] PlayerDTO dto)
+        public async Task<IActionResult> AddPlayer([FromBody] PlayerDTO dto)
         {
             var player = dto.ToPlayerFromPlayerDTO();
-            _context.Add(player);
-            _context.SaveChanges();
+            await _context.AddAsync(player);
+            await _context.SaveChangesAsync();
 
             return Ok(dto);
         }
 
         [HttpPut("{name}")]
-        public IActionResult EditPlayer([FromRoute] string name, [FromBody] PlayerDTO dto)
+        public async Task<IActionResult> EditPlayer([FromRoute] string name, [FromBody] PlayerDTO dto)
         {
-            var player = _context.Players.FirstOrDefault(p => p.Name == name);
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.Name == name);
             if (player == null)
             {
                 return NotFound();
@@ -50,26 +56,23 @@ namespace api.Controllers
             player.Position = dto.Position;
             player.Nationality = dto.Nationality;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(dto);
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeletePlayer([FromRoute] int id)
+        public async Task<IActionResult> DeletePlayer([FromRoute] int id)
         {
-            var player = _context.Players.FirstOrDefault(p => p.Id == id);
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.Id == id);
             if (player == null)
             {
                 return NotFound();
             }
             _context.Remove(player);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(player);
         }
-
-
-    
     }
 }

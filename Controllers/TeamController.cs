@@ -7,7 +7,7 @@ using api.DTOs;
 using api.Models;
 using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -21,57 +21,56 @@ namespace api.Controllers
             _context = context;
         }
         [HttpGet]
-        public List<TeamDTO> GetTeams()
+        public async Task<IActionResult> GetTeams()
         {
-            var teamsDto = _context.Teams
-            .ToList()
-            .Select(t => t.TeamDTOFromTeam())
-            .ToList();
-
-            return teamsDto;
+            var teams = await _context.Teams.ToListAsync();
+            var teamsDto = teams.Select(t => t.TeamDTOFromTeam());
+            
+            return Ok(teamsDto);
         }
 
         [HttpGet]
         [Route("{id:int}/squad")]
-        public TeamDTOWithPlayers GetTeamById([FromRoute] int id)
+        public async Task<IActionResult> GetTeamById([FromRoute] int id)
         {
-            var team = _context.Teams.Include(t => t.Players).FirstOrDefault(t => t.Id == id);
+            var team = await _context.Teams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == id);
             if (team == null)
             {
-                return null;
+                return NotFound();
             }
 
             var teamDto = team.TeamDTOWithPlayersFromTeam();
-            return teamDto;
+            return Ok(teamDto);
         }
 
         [HttpGet("{league}")]
-        public List<TeamDTO> GetTeamsByLeague([FromRoute] string league)
+        public async Task<IActionResult> GetTeamsByLeague([FromRoute] string league)
         {
-            var teamsDto = _context.Teams
+            var teams = await _context.Teams
             .Where(t => t.League == league)
-            .ToList()
-            .Select(t => t.TeamDTOFromTeam())
-            .ToList();
+            .ToListAsync();
 
-            return teamsDto;
+            var teamsDto = teams.Select(t => t.TeamDTOFromTeam());
+            
+
+            return Ok(teamsDto);
             
         }
 
         [HttpPost]
-        public IActionResult AddTeam([FromBody] CreateTeamDTO dto)
+        public async Task<IActionResult> AddTeam([FromBody] CreateTeamDTO dto)
         {
             var team = dto.TeamFromCreateTeamDTO();
-            _context.Add(team);
-            _context.SaveChanges();
+            await _context.AddAsync(team);
+            await _context.SaveChangesAsync();
             return Ok(team.TeamDTOFromTeam());
 
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult EditTeam([FromBody] TeamDTO dto, [FromRoute] int id)
+        public async Task<IActionResult> EditTeam([FromBody] TeamDTO dto, [FromRoute] int id)
         {
-            var team = _context.Teams.FirstOrDefault(t => t.Id == id);
+            var team = await _context.Teams.FirstOrDefaultAsync(t => t.Id == id);
             if (team == null)
             {
                 return NotFound();
@@ -83,20 +82,20 @@ namespace api.Controllers
             team.Coach = dto.Coach;
             team.Stadium = dto.Stadium;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Ok(team.TeamDTOFromTeam());
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteTeam([FromRoute] int id)
+        public async Task<IActionResult> DeleteTeam([FromRoute] int id)
         {
-            var team = _context.Teams.FirstOrDefault(t => t.Id == id);
+            var team = await _context.Teams.FirstOrDefaultAsync(t => t.Id == id);
             if (team == null)
             {
                 return NotFound();
             }
             _context.Remove(team);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Ok(team.TeamDTOFromTeam());
         }
     }

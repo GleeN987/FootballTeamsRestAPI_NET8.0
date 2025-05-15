@@ -12,6 +12,7 @@ namespace api.Models
         public int Age { get; set; }
         public string Position { get; set; } = string.Empty;
         public string Nationality { get; set; } = string.Empty;
-        public Team Team { get; set; }
+        public int? TeamId { get; set; }
+        public Team? Team { get; set; }
     }
 }

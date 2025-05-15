@@ -138,3 +138,4 @@ D:\Programming\.NET\footballAPI\api\obj\Debug\net8.0\refint\api.dll
 D:\Programming\.NET\footballAPI\api\obj\Debug\net8.0\api.pdb
 D:\Programming\.NET\footballAPI\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 D:\Programming\.NET\footballAPI\api\obj\Debug\net8.0\ref\api.dll
+D:\Programming\.NET\footballAPI\api\obj\Debug\net8.0\api.sourcelink.json
