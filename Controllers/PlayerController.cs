@@ -8,6 +8,7 @@ using api.Models;
 using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api.Interfaces;
 
 namespace api.Controllers
 {
@@ -16,20 +17,18 @@ namespace api.Controllers
     public class PlayerController : ControllerBase
     {
         private AppDBContext _context;
-        public PlayerController(AppDBContext context)
+        private IPlayerRepository _repo;
+        public PlayerController(AppDBContext context, IPlayerRepository repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetPlayers()
         {
-            var players = await _context.Players
-            .Include(p => p.Team)
-            .ToListAsync();
-
+            var players = await _repo.GetPlayersAsync();
             var playersDto = players.Select(p => p.ToPlayerDTO());
-            
             return Ok(playersDto);
         }
 
@@ -37,42 +36,30 @@ namespace api.Controllers
         public async Task<IActionResult> AddPlayer([FromBody] PlayerDTO dto)
         {
             var player = dto.ToPlayerFromPlayerDTO();
-            await _context.AddAsync(player);
-            await _context.SaveChangesAsync();
-
+            await _repo.AddPlayerAsync(player);
             return Ok(dto);
         }
 
         [HttpPut("{name}")]
         public async Task<IActionResult> EditPlayer([FromRoute] string name, [FromBody] PlayerDTO dto)
         {
-            var player = await _context.Players.FirstOrDefaultAsync(p => p.Name == name);
+            var player = await _repo.EditPlayerAsync(dto, name);
             if (player == null)
             {
                 return NotFound();
             }
-            player.Name = dto.Name;
-            player.Age = dto.Age;
-            player.Position = dto.Position;
-            player.Nationality = dto.Nationality;
-
-            await _context.SaveChangesAsync();
-
             return Ok(dto);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeletePlayer([FromRoute] int id)
         {
-            var player = await _context.Players.FirstOrDefaultAsync(p => p.Id == id);
+            var player = await _repo.DeletePlayerAsync(id);
             if (player == null)
             {
                 return NotFound();
             }
-            _context.Remove(player);
-            await _context.SaveChangesAsync();
-
-            return Ok(player);
+            return Ok(player.ToPlayerDTO());
         }
     }
 }
