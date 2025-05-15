@@ -33,7 +33,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("{id:int}/squad")]
+        [Route("squad/{id:int}")]
         public async Task<IActionResult> GetTeamById([FromRoute] int id)
         {
             var team = await _repo.GetTeamByIdAsync(id);
@@ -61,6 +61,8 @@ namespace api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTeam([FromBody] CreateTeamDTO dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var team = dto.TeamFromCreateTeamDTO();
             await _repo.AddTeamAsync(team);
             return Ok(team.TeamDTOFromTeam());
@@ -68,8 +70,10 @@ namespace api.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> EditTeam([FromBody] TeamDTO dto, [FromRoute] int id)
+        public async Task<IActionResult> EditTeam([FromBody] CreateTeamDTO dto, [FromRoute] int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
             var team = await _repo.EditTeamAsync(dto, id);
             if (team == null)
             {

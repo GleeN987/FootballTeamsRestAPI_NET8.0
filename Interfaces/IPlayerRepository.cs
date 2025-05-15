@@ -11,7 +11,7 @@ namespace api.Interfaces
     {
         Task<List<Player>> GetPlayersAsync();
         Task<Player> AddPlayerAsync(Player player);
-        Task<Player?> EditPlayerAsync(PlayerDTO dto, string name);
+        Task<Player?> EditPlayerAsync(CreatePlayerDTO dto, string name);
         Task<Player?> DeletePlayerAsync(int id);
     }
 }

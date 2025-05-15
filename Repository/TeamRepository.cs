@@ -37,7 +37,7 @@ namespace api.Repository
             return team;
         }
 
-        public async Task<Team?> EditTeamAsync(TeamDTO dto, int id)
+        public async Task<Team?> EditTeamAsync(CreateTeamDTO dto, int id)
         {
             var team = await _context.Teams.FindAsync(id);
             if (team == null)

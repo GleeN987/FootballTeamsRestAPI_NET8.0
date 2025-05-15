@@ -36,7 +36,7 @@ namespace api.Repository
             return player;
         }
 
-        public async Task<Player?> EditPlayerAsync(PlayerDTO dto, string name)
+        public async Task<Player?> EditPlayerAsync(CreatePlayerDTO dto, string name)
         {
             var player = await _context.Players.FirstOrDefaultAsync(p => p.Name == name);
             if (player == null)

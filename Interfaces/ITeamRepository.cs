@@ -13,7 +13,7 @@ namespace api.Interfaces
         Task<Team?> GetTeamByIdAsync(int id);
         Task<List<Team>> GetTeamsByLeagueAsync(string league);
         Task<Team> AddTeamAsync(Team team);
-        Task<Team?> EditTeamAsync(TeamDTO dto, int id);
+        Task<Team?> EditTeamAsync(CreateTeamDTO dto, int id);
         Task<Team?> DeleteTeamAsync(int id);
     }
 }

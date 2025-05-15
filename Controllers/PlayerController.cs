@@ -35,14 +35,18 @@ namespace api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPlayer([FromBody] PlayerDTO dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var player = dto.ToPlayerFromPlayerDTO();
             await _repo.AddPlayerAsync(player);
             return Ok(dto);
         }
 
         [HttpPut("{name}")]
-        public async Task<IActionResult> EditPlayer([FromRoute] string name, [FromBody] PlayerDTO dto)
+        public async Task<IActionResult> EditPlayer([FromRoute] string name, [FromBody] CreatePlayerDTO dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var player = await _repo.EditPlayerAsync(dto, name);
             if (player == null)
             {
