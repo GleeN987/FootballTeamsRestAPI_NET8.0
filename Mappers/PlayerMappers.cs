@@ -18,11 +18,22 @@ namespace api.Mappers
                 Position = player.Position,
                 Nationality = player.Nationality,
                 TeamId = player.TeamId
-                
+
             };
         }
 
         public static Player ToPlayerFromPlayerDTO(this PlayerDTO dto)
+        {
+            return new Player
+            {
+                Name = dto.Name,
+                Age = dto.Age,
+                Position = dto.Position,
+                Nationality = dto.Nationality,
+                TeamId = dto.TeamId
+            };
+        }
+           public static Player ToPlayerFromCreatePlayerDTO(this CreatePlayerDTO dto)
         {
             return new Player
             {

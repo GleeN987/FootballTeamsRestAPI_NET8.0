@@ -8,6 +8,8 @@ using api.Interfaces;
 using api.Mappers;
 using api.Data;
 using Microsoft.EntityFrameworkCore;
+using api.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace api.Repository
 {
@@ -64,10 +66,30 @@ namespace api.Repository
             return team;
         }
 
-        public async Task<List<Team>> GetTeamsAsync()
+        public async Task<List<Team>> GetTeamsAsync(QueryObjectTeams query)
         {
-            var teams = await _context.Teams.ToListAsync();
-            return teams;
+            var teams = _context.Teams.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                teams = teams.Where(t => t.Name.Contains(query.Name));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Country))
+            {
+                teams = teams.Where(t => t.Country.Contains(query.Country));
+            }
+            if (!string.IsNullOrWhiteSpace(query.League))
+            {
+                teams = teams.Where(t => t.League.Contains(query.League));
+            }
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    teams = query.Ascending ? teams.OrderBy(p => p.Name) : teams.OrderByDescending(p => p.Name);
+                }
+            }   
+            var PagesToSkip = (query.PageNum - 1) * query.PageSize;
+            return await teams.Skip(PagesToSkip).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<List<Team>> GetTeamsByLeagueAsync(string league)

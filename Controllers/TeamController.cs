@@ -9,6 +9,7 @@ using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Interfaces;
+using api.Helpers;
 
 namespace api.Controllers
 {
@@ -24,9 +25,9 @@ namespace api.Controllers
             _repo = repo;
         }
         [HttpGet]
-        public async Task<IActionResult> GetTeams()
+        public async Task<IActionResult> GetTeams([FromQuery] QueryObjectTeams query)
         {
-            var teams = await _repo.GetTeamsAsync();
+            var teams = await _repo.GetTeamsAsync(query);
             var teamsDto = teams.Select(t => t.TeamDTOFromTeam());
             
             return Ok(teamsDto);
@@ -73,7 +74,7 @@ namespace api.Controllers
         public async Task<IActionResult> EditTeam([FromBody] CreateTeamDTO dto, [FromRoute] int id)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            
+
             var team = await _repo.EditTeamAsync(dto, id);
             if (team == null)
             {

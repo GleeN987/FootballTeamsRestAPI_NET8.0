@@ -9,6 +9,7 @@ using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Interfaces;
+using api.Helpers;
 
 namespace api.Controllers
 {
@@ -25,19 +26,19 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPlayers()
+        public async Task<IActionResult> GetPlayers([FromQuery] QueryObjectPlayers query)
         {
-            var players = await _repo.GetPlayersAsync();
+            var players = await _repo.GetPlayersAsync(query);
             var playersDto = players.Select(p => p.ToPlayerDTO());
             return Ok(playersDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddPlayer([FromBody] PlayerDTO dto)
+        public async Task<IActionResult> AddPlayer([FromBody] CreatePlayerDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var player = dto.ToPlayerFromPlayerDTO();
+            var player = dto.ToPlayerFromCreatePlayerDTO();
             await _repo.AddPlayerAsync(player);
             return Ok(dto);
         }
